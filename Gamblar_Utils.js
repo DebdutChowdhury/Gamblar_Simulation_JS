@@ -1,6 +1,10 @@
 let constant = require('./Gambler_Constants')
 let monthCompute = require('./monthlyCount')
 let compute = new monthCompute(constant)
+// let lucky = require('./luckiestGame')
+const LuckyGame = require('./luckiestGame')
+let game = new LuckyGame
+let readline = require('readline-sync')
 class Gamblar{
     // STACK_AMOUNT; BETTING_AMOUNT; MONTHLY_DAYS; monthly_investment; monthly_stake; gambler_stack_win; gambler_stack_loose
     constructor(){
@@ -29,17 +33,28 @@ class Gamblar{
                 }
             }            
             // console.log(`Game Result of ${day} day is : ${result}`);
-            if (result > constant.gambler_stack_loose){
-                console.log(`Game win day ${day} amount : $${result}`);
-            }
-            else{
-                console.log(`Game loose day ${day} amount : &${result}`);
+            switch(result){
+                case ( constant.gambler_stack_loose ) :
+                    console.log(`Result of day ${day} is Gambler loss $${result}`);
+                    constant.unluckiest_days[++constant.unluckiest_count] = day; 
+                    break;
+                default :
+                    console.log(`Result of day ${day} is Gambler Won $${result}`);
+                    constant.luckiest_days[++constant.luckiest_count] = day;
+                    break;
             }
             constant.monthly_investment += constant.STACK_AMOUNT;
-            constant.monthly_stake +=  result;
+            constant.monthly_stake += result;
         }
-        
+        game.LuckyGame();
         compute.compute();
+       
+        if(constant.monthly_stake > constant.monthly_investment){
+            var user_decide = readline.question('Press 1 to continue game : ')
+            if(user_decide == 1){
+                new Gamblar().checkResult();
+            }
+        }
     }
 }
 
